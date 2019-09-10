@@ -1,6 +1,6 @@
 {
-    "category": "Build",
-    "provider": "JRuby",
+    "category": "Test",
+    "provider": "cfn-nag",
     "version": "1",
     "settings": {
         "entityUrlTemplate": "https://my-build-instance/job/{Config:CpRubyGuy}/",

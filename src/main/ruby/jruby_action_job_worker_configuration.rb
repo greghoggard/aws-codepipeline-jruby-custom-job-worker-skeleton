@@ -12,9 +12,9 @@ class SampleCustomJRubyActionJobWorkerConfiguration < DefaultJobWorkerConfigurat
   # work items to process
   #
   def getActionTypeId
-    ActionTypeId.new 'Build',   # category
+    ActionTypeId.new 'Test',   # category
                      'Custom',  # third party or custom
-                     'JRuby',   # provider
+                     'cfn-nag',   # provider
                      '1'        # version
   end
 

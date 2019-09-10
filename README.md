@@ -56,7 +56,7 @@ private static final int WORKER_THREADS = 10;
 The job worker comes with AWS CodeDeploy installation scripts. Set up your application and deployment group in AWS CodeDeploy and run the following command to deploy the agent:
 ```bash
 # Replace with your Amazon S3 bucket name
-AMAZON_S3_BUCKET=<your-amazon-s3-bucket>
+AMAZON_S3_BUCKET=cfn-nag-jobworker-bucket<your-amazon-s3-bucket>
 # Make sure that you set up your application and deployment group in AWS CodeDeploy
 APPLICATION_NAME=AwsCodePipelineJobWorker
 DEPLOYMENT_GROUP_NAME=Production
@@ -82,6 +82,6 @@ aws deploy create-deployment --application-name $APPLICATION_NAME --deployment-g
 3. Update application-start.sh to refer to the proper configuration class
 4. mvn install
 5. Deploy target/AwsCodePipelineJobWorker-cp.tar through aforementioned instructions
-6. Use AWS CLI to define custom action using src/main/resources/custom_action_defintion.sjon
+6. Use AWS CLI to define custom action using src/main/resources/custom_action_defintion.json
 7. Define CodePipeline pipeline and refer to action
 8. To see worker in action, ssh into box where deployed and tail /var/log/aws-codepipeline-jobworker/*.log
