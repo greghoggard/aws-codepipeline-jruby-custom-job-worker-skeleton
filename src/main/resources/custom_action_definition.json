@@ -1,5 +1,5 @@
 {
-    "category": "Test",
+    "category": "Build",
     "provider": "cfn-nag",
     "version": "1",
     "settings": {
