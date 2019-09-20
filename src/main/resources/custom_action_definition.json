@@ -1,20 +1,40 @@
 {
     "category": "Build",
     "provider": "cfn-nag",
-    "version": "1",
+    "version": "2",
     "settings": {
-        "entityUrlTemplate": "https://my-build-instance/job/{Config:CpRubyGuy}/",
-        "executionUrlTemplate": "https://my-build-instance/job/{Config:CpRubyGuy}/lastSuccessfulBuild/{ExternalExecutionId}/"
+        "entityUrlTemplate": "https://s3.console.aws.amazon.com/s3/buckets/{Config:S3 Bucket Name}/?region={Config:S3 Bucket Region}&tab=overview",
+        "executionUrlTemplate": "https://s3.console.aws.amazon.com/s3/buckets/{Config:S3 Bucket Name}/?region={Config:S3 Bucket Region}&tab=overview"
     },
-    "configurationProperties": [{
-        "name": "CpRubyGuy",
-        "required": true,
-        "key": true,
-        "secret": false,
-        "queryable": false,
-        "description": "The name of the build project must be provided when this action is added to the pipeline.",
-        "type": "String"
-    }],
+    "configurationProperties": [
+        {
+            "name": "CpRubyGuy",
+            "required": true,
+            "key": true,
+            "secret": false,
+            "queryable": false,
+            "description": "The name of the build project must be provided when this action is added to the pipeline.",
+            "type": "String"
+        },
+        {
+            "name": "S3 Bucket Name",
+            "required": true,
+            "key": true,
+            "secret": false,
+            "queryable": false,
+            "description": "The S3 bucket where the cfn-nag report will be published. This can also be the S3 bucket where the application was built to.",
+            "type": "String"
+        },
+        {
+            "name": "S3 Bucket Region",
+            "required": true,
+            "key": true,
+            "secret": false,
+            "queryable": false,
+            "description": "The Region where the S3 bucket specified above lives.",
+            "type": "String"
+        }
+    ],
     "inputArtifactDetails": {
         "maximumCount": 1,
         "minimumCount": 0 
