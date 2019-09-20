@@ -8,6 +8,7 @@ java_import 'com.amazonaws.codepipeline.jobworker.JobProcessor'
 java_import 'java.util.UUID'
 
 require 'aws-sdk'
+require 'cfn-nag'
 
 class SampleCodePipelineJobProcessor
   include JobProcessor
