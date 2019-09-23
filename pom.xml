@@ -69,6 +69,13 @@
             <type>gem</type>
         </dependency>
 
+        <dependency>
+            <groupId>rubygems</groupId>
+            <artifactId>cfn-nag</artifactId>
+            <version>0.4.39</version>
+            <type>gem</type>
+        </dependency>
+
     </dependencies>
 
     <build>
