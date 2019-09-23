@@ -23,6 +23,10 @@ class SampleCodePipelineJobProcessor
   #
   def process(work_item)
     action_configuration_hash = work_item.getJobData.getActionConfiguration
+    puts '========'
+    puts "Action Configuration Hash: "
+    puts action_configuration_hash
+    puts '============'
 
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
 

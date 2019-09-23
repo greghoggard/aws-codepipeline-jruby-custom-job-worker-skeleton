@@ -26,7 +26,7 @@ public class CustomActionJobWorkerConfiguration extends DefaultJobWorkerConfigur
      * @return action type identifier
      */
     public ActionTypeId getActionTypeId() {
-        return new ActionTypeId("Build", "Custom", "cfn-nag", "1");
+        return new ActionTypeId("Build", "Custom", "cfn-nag", "2");
     }
 
     /**

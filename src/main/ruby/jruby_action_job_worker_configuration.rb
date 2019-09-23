@@ -15,7 +15,7 @@ class SampleCustomJRubyActionJobWorkerConfiguration < DefaultJobWorkerConfigurat
     ActionTypeId.new 'Build',   # category
                      'Custom',  # third party or custom
                      'cfn-nag',   # provider
-                     '1'        # version
+                     '2'        # version
   end
 
   def jobService
