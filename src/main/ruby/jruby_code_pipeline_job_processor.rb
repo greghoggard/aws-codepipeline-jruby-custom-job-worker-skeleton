@@ -9,6 +9,7 @@ java_import 'java.util.UUID'
 
 require 'aws-sdk'
 require 'cfn-nag'
+require 'zip'
 
 class SampleCodePipelineJobProcessor
   include JobProcessor
@@ -23,17 +24,35 @@ class SampleCodePipelineJobProcessor
   #
   def process(work_item)
     action_configuration_hash = work_item.getJobData.getActionConfiguration
-    puts '========'
-    puts "Action Configuration Hash: "
-    puts action_configuration_hash
-    puts '============'
+
+    input_artifact = work_item.getJobData.getInputArtifacts
+    artifact_bucket = input_artifact[0].s3BucketName
+    object_key = input_artifact[0].s3ObjectKey
 
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
+    s3 = Aws::S3::Client.new
 
-    File.open('/var/tmp/cp_operation_names', 'w') { |file| file.write codepipeline.operation_names.to_s }
+    File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
+      reap = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
+    end
+
+    unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
     WorkResult.success work_item.getJobId,
                        ExecutionDetails.new('test summary', UUID.randomUUID.toString, 100),
                        CurrentRevision.new('test revision', 'test change identifier')
+  end
+
+  private
+
+  def unzip(zip, unzip_dir)
+    Zip::File.open(zip) do |zip_file|
+      zip_file.each do |f|
+        f_path=File.join(unzip_dir, f.name)
+        FileUtils.mkdir_p(File.dirname(f_path))
+        zip_file.extract(f, f_path) unless File.exist?(f_path)
+      end
+    end
+  end
   end
 end
