@@ -52,7 +52,7 @@ public abstract class DefaultJobWorkerConfiguration implements JobWorkerConfigur
     /**
      * Environment variable to override region.
      */
-    private static final String AWS_REGION = "US_EAST_1";
+    private static final String AWS_REGION = "AWS_REGION";
 
     /**
      * @return the poll interval in milliseconds
