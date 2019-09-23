@@ -54,5 +54,5 @@ class SampleCodePipelineJobProcessor
       end
     end
   end
-  end
+
 end
