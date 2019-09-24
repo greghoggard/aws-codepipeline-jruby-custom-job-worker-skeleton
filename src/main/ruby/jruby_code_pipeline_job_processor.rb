@@ -41,7 +41,7 @@ class SampleCodePipelineJobProcessor
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
-    total_failure_count = audit('/var/tmp/input_artifact/cfn')
+    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
