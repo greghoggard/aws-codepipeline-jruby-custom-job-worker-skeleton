@@ -42,10 +42,11 @@ class SampleCodePipelineJobProcessor
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
     total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
+    result = 'Total Failures #{total_failure_count}'
 
     # if total_failure_count == 0
     WorkResult.success work_item.getJobId,
-                       ExecutionDetails.new('Total Failures #{total_failure_count}', UUID.randomUUID.toString, 100),
+                       ExecutionDetails.new(result, UUID.randomUUID.toString, 100),
                        CurrentRevision.new('test revision', 'test change identifier')
     # else
     #   WorkResult.failure work_item.getJobId,
@@ -74,7 +75,7 @@ class SampleCodePipelineJobProcessor
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
     File.open('/var/tmp/results.txt', 'w') do |file|
-      cfn_nag.render_results(aggregate_results: aggregate_results,
+      file << cfn_nag.render_results(aggregate_results: aggregate_results,
                              output_format: 'txt')
     end
 
