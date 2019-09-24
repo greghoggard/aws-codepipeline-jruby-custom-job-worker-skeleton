@@ -1,6 +1,8 @@
 require 'java'
 
 java_import 'com.amazonaws.codepipeline.jobworker.model.CurrentRevision'
+java_import 'com.amazonaws.codepipeline.jobworker.model.FailureDetails'
+java_import 'com.amazonaws.codepipeline.jobworker.model.FailureType'
 java_import 'com.amazonaws.codepipeline.jobworker.model.ExecutionDetails'
 java_import 'com.amazonaws.codepipeline.jobworker.model.WorkItem'
 java_import 'com.amazonaws.codepipeline.jobworker.model.WorkResult'
@@ -39,9 +41,16 @@ class SampleCodePipelineJobProcessor
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
-    WorkResult.success work_item.getJobId,
-                       ExecutionDetails.new('test summary', UUID.randomUUID.toString, 100),
-                       CurrentRevision.new('test revision', 'test change identifier')
+    total_failure_count = audit('/var/tmp/input_artifact/cfn')
+
+    if total_failure_count == 0
+      WorkResult.success work_item.getJobId,
+                         ExecutionDetails.new('No failures', UUID.randomUUID.toString, 100),
+                         CurrentRevision.new('test revision', 'test change identifier')
+    else
+      WorkResult.failure work_item.getJobId,
+                         FailureDetails.new(FailureType.JobFailed, 'Total Failures #{total_failure_count}')
+    end
   end
 
   private
@@ -54,6 +63,25 @@ class SampleCodePipelineJobProcessor
         zip_file.extract(f, f_path) unless File.exist?(f_path)
       end
     end
+  end
+
+  def cfn_nag
+    config = CfnNagConfig.new
+    CfnNag.new(config: config)
+  end
+
+  def audit(input_path:)
+    aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
+
+    File.open('/var/tmp/results.txt', 'w') do |file|
+      cfn_nag.render_results(aggregate_results: aggregate_results,
+                             output_format: 'txt')
+    end
+
+    aggregate_results.inject(0) do |total_failure_count, results|
+      total_failure_count + results[:file_results][:failure_count]
+    end
+    total_failure_count
   end
 
 end
