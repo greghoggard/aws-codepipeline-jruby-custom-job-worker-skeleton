@@ -9,6 +9,7 @@ java_import 'java.util.UUID'
 
 require 'aws-sdk'
 require 'cfn-nag'
+require 'rubygems'
 require 'zip'
 
 class SampleCodePipelineJobProcessor
