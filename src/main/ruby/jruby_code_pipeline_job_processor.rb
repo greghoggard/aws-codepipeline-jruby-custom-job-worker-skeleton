@@ -83,7 +83,7 @@ class SampleCodePipelineJobProcessor
     aggregate_results.inject(0) do |total_failure_count, results|
       total_failure_count + results[:file_results][:failure_count]
     end
-    FileUtils.rm(input_path)
+    FileUtils.rm_rf(input_path)
   end
 
 end
