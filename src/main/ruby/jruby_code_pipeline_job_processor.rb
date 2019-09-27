@@ -35,17 +35,18 @@ class SampleCodePipelineJobProcessor
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
     s3 = Aws::S3::Client.new
 
-    File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
+    uuid = UUID.randomUUID.toString
+    File.open('/var/tmp/input_artifact_#{uuid}.zip', 'wb') do |file|
       resp = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
     end
 
-    unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
+    unzip('/var/tmp/input_artifact_#{uuid}.zip', '/var/tmp/input_artifact_#{uuid}')
 
-    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
+    total_failure_count = audit(input_path: '/var/tmp/input_artifact_#{uuid}/cfn')
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
-                      ExecutionDetails.new('No violations!', UUID.randomUUID.toString, 100),
+                      ExecutionDetails.new('No violations!', uuid, 100),
                       CurrentRevision.new('test revision', 'test change identifier')
     else
       WorkResult.failure work_item.getJobId,
@@ -73,7 +74,7 @@ class SampleCodePipelineJobProcessor
   def audit(input_path:)
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
-    File.open('/var/tmp/results.txt', 'w') do |file|
+    File.open('/var/tmp/results_#{uuid}.txt', 'w') do |file|
       file << cfn_nag.render_results(aggregate_results: aggregate_results,
                              output_format: 'txt')
     end
