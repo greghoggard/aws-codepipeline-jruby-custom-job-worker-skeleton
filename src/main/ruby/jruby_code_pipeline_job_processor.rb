@@ -36,13 +36,13 @@ class SampleCodePipelineJobProcessor
     s3 = Aws::S3::Client.new
 
     uuid = UUID.randomUUID.toString
-    File.open('/var/tmp/input_artifact_#{uuid}.zip', 'wb') do |file|
+    File.open('/var/tmp/input_artifact_' + uuid + '.zip', 'wb') do |file|
       resp = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
     end
 
-    unzip('/var/tmp/input_artifact_#{uuid}.zip', '/var/tmp/input_artifact_#{uuid}')
+    unzip('/var/tmp/input_artifact_' + uuid + '.zip', '/var/tmp/input_artifact_' + uuid)
 
-    total_failure_count = audit(input_path: '/var/tmp/input_artifact_#{uuid}/cfn')
+    total_failure_count = audit(input_path: '/var/tmp/input_artifact_' + uuid + '/cfn', uuid)
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
@@ -71,10 +71,10 @@ class SampleCodePipelineJobProcessor
     CfnNag.new(config: config)
   end
 
-  def audit(input_path:)
+  def audit(input_path:, uuid)
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
-    File.open('/var/tmp/results_#{uuid}.txt', 'w') do |file|
+    File.open('/var/tmp/results_' + uuid + '.txt', 'w') do |file|
       file << cfn_nag.render_results(aggregate_results: aggregate_results,
                              output_format: 'txt')
     end
