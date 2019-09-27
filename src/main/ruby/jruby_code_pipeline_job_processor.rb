@@ -75,7 +75,7 @@ class SampleCodePipelineJobProcessor
   def audit(input_path:)
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
-    File.open('/var/tmp/results.txt', 'w') do |file|
+    File.open("/var/tmp/results_#{UUID.randomUUID.toString}.txt", 'w') do |file|
       file << cfn_nag.render_results(aggregate_results: aggregate_results,
                              output_format: 'txt')
     end
@@ -83,7 +83,7 @@ class SampleCodePipelineJobProcessor
     aggregate_results.inject(0) do |total_failure_count, results|
       total_failure_count + results[:file_results][:failure_count]
     end
-    FileUtils.rm_rf(input_path)
+    FileUtils.rm_rf('/var/tmp/input_artifact')
   end
 
 end
