@@ -49,7 +49,7 @@ class SampleCodePipelineJobProcessor
                       CurrentRevision.new('test revision', 'test change identifier')
     else
       WorkResult.failure work_item.getJobId,
-                         FailureDetails.new(FailureDetails.getType('JobFailed'), 'Violations were detected!')
+                         FailureDetails.new(FailureType::JobFailed, 'Violations were detected!')
     end
   end
 
