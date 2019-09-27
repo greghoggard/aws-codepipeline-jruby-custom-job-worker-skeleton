@@ -36,22 +36,21 @@ class SampleCodePipelineJobProcessor
     s3 = Aws::S3::Client.new
 
     File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
-      reap = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
+      resp = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
     end
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
     total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
-    result = 'Total Failures #{total_failure_count}'
 
-    # if total_failure_count == 0
-    WorkResult.success work_item.getJobId,
-                       ExecutionDetails.new(result, UUID.randomUUID.toString, 100),
-                       CurrentRevision.new('test revision', 'test change identifier')
-    # else
-    #   WorkResult.failure work_item.getJobId,
-    #                      FailureDetails.new(FailureType.JobFailed, 'Total Failures #{total_failure_count}')
-    # end
+    if total_failure_count == 0
+      WorkResult.success work_item.getJobId,
+                      ExecutionDetails.new('No violations!', UUID.randomUUID.toString, 100),
+                      CurrentRevision.new('test revision', 'test change identifier')
+    else
+      WorkResult.failure work_item.getJobId,
+                         FailureDetails.new(FailureType.JobFailed, 'Violations were detected!')
+    end
   end
 
   private
