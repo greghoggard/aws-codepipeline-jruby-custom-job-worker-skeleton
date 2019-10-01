@@ -29,20 +29,23 @@ class SampleCodePipelineJobProcessor
     action_configuration_hash = work_item.getJobData.getActionConfiguration
 
     input_artifact = work_item.getJobData.getInputArtifacts
-    artifact_bucket = input_artifact[0].s3BucketName
-    object_key = input_artifact[0].s3ObjectKey
+    output_artifact = work_item.getJobData.getOutputArtifacts
+    input_bucket = input_artifact[0].s3BucketName
+    input_object_key = input_artifact[0].s3ObjectKey
+    output_bucket = output_artifact[0].s3BucketName
+    output_object_key = output_artifact[0].s3ObjectKey
 
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
     s3 = Aws::S3::Client.new
 
 
     File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
-      resp = s3.get_object({ bucket: artifact_bucket, key: object_key }, target: file)
+      resp = s3.get_object({ bucket: input_bucket, key: input_object_key }, target: file)
     end
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
-    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
+    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn', s3, output_bucket, output_object_key)
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
@@ -72,10 +75,10 @@ class SampleCodePipelineJobProcessor
     CfnNag.new(config: config)
   end
 
-  def audit(input_path:)
+  def audit(input_path:, s3, output_bucket, output_object_key)
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
-    File.open("/var/tmp/results_#{UUID.randomUUID.toString}.txt", 'w') do |file|
+    File.open("/var/tmp/cfn_nag_results.txt", 'w') do |file|
       file << cfn_nag.render_results(aggregate_results: aggregate_results,
                              output_format: 'txt')
     end
@@ -83,6 +86,8 @@ class SampleCodePipelineJobProcessor
     aggregate_results.inject(0) do |total_failure_count, results|
       total_failure_count + results[:file_results][:failure_count]
     end
+
+    resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
     FileUtils.rm_rf('/var/tmp/input_artifact')
   end
 
