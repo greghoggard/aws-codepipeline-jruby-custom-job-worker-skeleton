@@ -45,7 +45,7 @@ class SampleCodePipelineJobProcessor
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
-    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn', s3, output_bucket, output_object_key)
+    total_failure_count = audit(s3, output_bucket, output_object_key, input_path: '/var/tmp/input_artifact/cfn')
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
@@ -75,7 +75,7 @@ class SampleCodePipelineJobProcessor
     CfnNag.new(config: config)
   end
 
-  def audit(input_path:, s3, output_bucket, output_object_key)
+  def audit(s3, output_bucket, output_object_key, input_path:)
     aggregate_results = cfn_nag.audit_aggregate_across_files(input_path: input_path)
 
     File.open("/var/tmp/cfn_nag_results.txt", 'w') do |file|
