@@ -36,7 +36,7 @@ class SampleCodePipelineJobProcessor
     output_object_key = output_artifact[0].s3ObjectKey
 
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
-    s3 = Aws::S3::Client.new
+    s3 = Aws::S3::Client.new(region: 'us-east-1')
 
 
     File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
