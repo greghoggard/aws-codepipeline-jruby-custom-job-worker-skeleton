@@ -87,7 +87,7 @@ class SampleCodePipelineJobProcessor
     aggregate_results.inject(0) do |total_failure_count, results|
       total_failure_count + results[:file_results][:failure_count]
     end
-    FileUtils.rm_rf('/var/tmp/input_artifact')
+    # FileUtils.rm_rf('/var/tmp/input_artifact')
   end
 
 end
