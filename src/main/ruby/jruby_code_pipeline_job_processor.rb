@@ -37,6 +37,7 @@ class SampleCodePipelineJobProcessor
 
     codepipeline = Aws::CodePipeline::Client.new(region: 'us-east-1')
     s3 = Aws::S3::Client.new(region: 'us-east-1')
+    uuid = UUID.randomUUID.toString
 
 
     File.open('/var/tmp/input_artifact.zip', 'wb') do |file|
@@ -46,11 +47,18 @@ class SampleCodePipelineJobProcessor
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
     total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
-    resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
+
+    s3 = Aws::S3::Resource.new(region:'us-east-1')
+    obj = s3.bucket(output_bucket).object(uuid)
+
+    File.open('/var/tmp/cfn_nag_results.txt', 'rb') do |file|
+      obj.put(body: file)
+    end
+    # resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
-                      ExecutionDetails.new('No violations!', UUID.randomUUID.toString, 100),
+                      ExecutionDetails.new('No violations!', uuid, 100),
                       CurrentRevision.new('test revision', 'test change identifier')
     else
       WorkResult.failure work_item.getJobId,
