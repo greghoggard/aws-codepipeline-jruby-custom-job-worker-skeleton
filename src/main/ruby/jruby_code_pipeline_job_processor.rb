@@ -49,11 +49,14 @@ class SampleCodePipelineJobProcessor
     total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
 
     s3 = Aws::S3::Resource.new(region:'us-east-1')
-    obj = s3.bucket(output_bucket).object(uuid)
+    obj = s3.bucket(output_bucket).object(output_object_key)
 
     File.open('/var/tmp/cfn_nag_results.txt', 'rb') do |file|
       obj.put(body: file)
     end
+
+    FileUtils.rm('/var/tmp/cfn_nag_results.txt')
+    FileUtils.rm_rf('/var/tmp/input_artifact')
     # resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
 
     if total_failure_count == 0
