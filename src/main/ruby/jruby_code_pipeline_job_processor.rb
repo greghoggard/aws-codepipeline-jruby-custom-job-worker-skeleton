@@ -55,8 +55,7 @@ class SampleCodePipelineJobProcessor
       obj.put(body: file)
     end
 
-    FileUtils.rm('/var/tmp/cfn_nag_results.txt')
-    FileUtils.rm_rf('/var/tmp/input_artifact')
+    clean_up
     # resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
 
     if total_failure_count == 0
@@ -98,7 +97,11 @@ class SampleCodePipelineJobProcessor
     aggregate_results.inject(0) do |total_failure_count, results|
       total_failure_count + results[:file_results][:failure_count]
     end
-    # FileUtils.rm_rf('/var/tmp/input_artifact')
+  end
+
+  def clean_up
+    FileUtils.rm('/var/tmp/cfn_nag_results.txt')
+    FileUtils.rm_rf('/var/tmp/input_artifact')
   end
 
 end
