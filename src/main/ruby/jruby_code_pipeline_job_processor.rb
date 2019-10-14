@@ -13,6 +13,7 @@ require 'aws-sdk'
 require 'cfn-nag'
 require 'rubygems'
 require 'zip'
+require 'logger'
 
 class SampleCodePipelineJobProcessor
   include JobProcessor
