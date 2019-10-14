@@ -27,6 +27,7 @@ class SampleCodePipelineJobProcessor
   #
   def process(work_item)
     action_configuration_hash = work_item.getJobData.getActionConfiguration
+    template_path = action_configuration_hash['configuration']['Template Path']
 
     input_artifact = work_item.getJobData.getInputArtifacts
     output_artifact = work_item.getJobData.getOutputArtifacts
@@ -56,7 +57,6 @@ class SampleCodePipelineJobProcessor
     end
 
     clean_up
-    # resp = s3.put_object({body: "/var/tmp/cfn_nag_results.txt", bucket: output_bucket, key: output_object_key})
 
     if total_failure_count == 0
       WorkResult.success work_item.getJobId,
