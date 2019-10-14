@@ -47,7 +47,7 @@ class SampleCodePipelineJobProcessor
 
     unzip('/var/tmp/input_artifact.zip', '/var/tmp/input_artifact')
 
-    total_failure_count = audit(input_path: '/var/tmp/input_artifact/cfn')
+    total_failure_count = audit(input_path: "/var/tmp/input_artifact/#{template_path}")
 
     s3 = Aws::S3::Resource.new(region:'us-east-1')
     obj = s3.bucket(output_bucket).object(output_object_key)
