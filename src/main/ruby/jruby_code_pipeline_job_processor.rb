@@ -27,7 +27,10 @@ class SampleCodePipelineJobProcessor
   #
   def process(work_item)
     action_configuration_hash = work_item.getJobData.getActionConfiguration
-    template_path = action_configuration_hash['configuration']['Template Path']
+    logger = Logger.new(STDOUT)
+    logger.info("ActionConfigurationHash:")
+    logger.info(action_configuration_hash)
+    # template_path = action_configuration_hash['configuration']['Template Path']
 
     input_artifact = work_item.getJobData.getInputArtifacts
     output_artifact = work_item.getJobData.getOutputArtifacts
